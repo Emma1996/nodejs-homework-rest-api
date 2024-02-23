@@ -1,4 +1,5 @@
 const express = require("express");
+const Joi = require("joi");
 const router = express.Router();
 const {
   listContacts,
@@ -7,6 +8,11 @@ const {
   removeContact,
   updateContact,
 } = require("../../models/contacts");
+const contactSchema = Joi.object({
+  name: Joi.string().required(),
+  email: Joi.string().email().required(),
+  phone: Joi.string().required(),
+});
 
 router.get("/", async (req, res) => {
   const contacts = await listContacts();
@@ -25,12 +31,17 @@ router.get("/:id", async (req, res) => {
 });
 
 router.post("/", async (req, res) => {
-  const { name, email, phone } = req.body;
-  if (!name || !email || !phone) {
-    return res.status(400).json({ message: "missing required fields" });
+  try {
+    const { error } = contactSchema.validate(req.body);
+    if (error) {
+      return res.status(400).json({ message: error.details[0].message });
+    }
+
+    const contact = await addContact(req.body);
+    res.status(201).json(contact);
+  } catch (error) {
+    res.status(500).json({ message: "Internal Server Error" });
   }
-  const contact = await addContact({ name, email, phone });
-  res.status(201).json(contact);
 });
 
 router.delete("/:id", async (req, res) => {
@@ -43,15 +54,20 @@ router.delete("/:id", async (req, res) => {
 });
 
 router.put("/:id", async (req, res) => {
-  const { name, email, phone } = req.body;
-  if (!name && !email && !phone) {
-    return res.status(400).json({ message: "missing fields" });
-  }
-  const contact = await updateContact(req.params.id, { name, email, phone });
-  if (contact) {
-    res.status(200).json(contact);
-  } else {
-    res.status(404).json({ message: "Not found" });
+  try {
+    const { error } = contactSchema.validate(req.body);
+    if (error) {
+      return res.status(400).json({ message: error.details[0].message });
+    }
+
+    const contact = await updateContact(req.params.id, req.body);
+    if (contact) {
+      res.status(200).json(contact);
+    } else {
+      res.status(404).json({ message: "Not found" });
+    }
+  } catch (error) {
+    res.status(500).json({ message: "Internal Server Error" });
   }
 });
 
