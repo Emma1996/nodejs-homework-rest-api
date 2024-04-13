@@ -1,19 +1,31 @@
-// const fs = require('fs/promises')
+const mongoose = require("mongoose");
+const { Schema, SchemaTypes } = mongoose;
 
-const listContacts = async () => {}
+const mongoosePaginate = require("mongoose-paginate-v2");
 
-const getContactById = async (contactId) => {}
+const contactSchema = new Schema({
+  name: {
+    type: String,
+    required: [true, "Set name for contact"],
+  },
+  email: {
+    type: String,
+  },
+  phone: {
+    type: String,
+  },
+  favorite: {
+    type: Boolean,
+    default: false,
+  },
+  owner: {
+    type: SchemaTypes.ObjectId,
+    ref: "user",
+  },
+});
 
-const removeContact = async (contactId) => {}
+contactSchema.plugin(mongoosePaginate);
 
-const addContact = async (body) => {}
+const Contact = mongoose.model("contact", contactSchema);
 
-const updateContact = async (contactId, body) => {}
-
-module.exports = {
-  listContacts,
-  getContactById,
-  removeContact,
-  addContact,
-  updateContact,
-}
+module.exports = Contact;
