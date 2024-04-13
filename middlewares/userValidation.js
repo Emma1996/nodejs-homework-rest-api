@@ -1,4 +1,3 @@
-// Мидлвар для валидации
 const Joi = require("joi");
 const { SubTypes } = require("../helpers/constants");
 
@@ -6,7 +5,7 @@ const schemaRegLogUser = Joi.object({
   email: Joi.string()
     .email({
       minDomainSegments: 2,
-      tlds: { allow: ["com", "net", "org", "ua", "ru", "gov", "ca"] },
+      tlds: { allow: ["com", "net", "org", "ro", "de", "gov", "ca"] },
     })
     .pattern(
       /^([\w-]+(?:\.[\w-]+)*)@((?:[\w-]+\.)*\w[\w-]{0,66})\.([a-z]{2,6}(?:\.[a-z]{2})?)$/i

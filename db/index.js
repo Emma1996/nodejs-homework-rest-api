@@ -6,7 +6,7 @@ const URI =
 const db = async () => {
   try {
     await mongoose.connect(URI, {
-      useUnifiedTopology: true, // Add this option to remove the deprecation warning
+      useUnifiedTopology: true,
     });
     console.log("Database connection successful");
   } catch (error) {
